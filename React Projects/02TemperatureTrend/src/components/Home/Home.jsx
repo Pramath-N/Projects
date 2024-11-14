@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const Home = () => {
   const [selectedCity, setSelectedCity] = useState('----');
+  const [disCity, setDisCity] = useState('')
   const [imageBase64, setImageBase64] = useState(''); // Store base64 image
 
   const handleCityChange = (event) => {
@@ -12,6 +13,7 @@ const Home = () => {
 
   const fetchTemperatureTrend = async () => {
     if(selectedCity === "----") return;
+    setDisCity(selectedCity)
     try {
       const response = await fetch('http://localhost:5000/process_city', {
         method: 'POST',
@@ -61,7 +63,7 @@ const Home = () => {
 
       {imageBase64 && (
         <div className="mt-8 text-center">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">Temperature Trend for {selectedCity}</h2>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4"> {(disCity === '') ? ('') : (`Temperature Trend for ${disCity}`)}</h2>
           <img
             src={`data:image/png;base64,${imageBase64}`} // Display image from base64 string
             alt={`Temperature Trend for ${selectedCity}`}
