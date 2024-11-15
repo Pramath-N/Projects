@@ -2,33 +2,26 @@ import React, { useState } from 'react';
 
 const TemperatureTrend = () => {
   const [selectedCity, setSelectedCity] = useState('----');
-  const [disCity, setDisCity] = useState('')
-  const [imageBase64, setImageBase64] = useState(''); // Store base64 image
+  const [imageBase64, setImageBase64] = useState('');
 
-  const handleCityChange = (event) => {
-    setSelectedCity(event.target.value);
-  };
-
-  const cities = ["----","Ahemadabad", "Bengaluru", "Chennai", "Delhi", "Hyderabad", "Kolkata", "Mumbai", "Pune"];
+  const cities = ["----", "Ahmedabad", "Bengaluru", "Chennai", "Delhi", "Hyderabad", "Kolkata", "Mumbai", "Pune"];
 
   const fetchTemperatureTrend = async () => {
-    if(selectedCity === "----") return;
-    setDisCity(selectedCity)
+    if (selectedCity === "----") return;
     try {
       const response = await fetch('http://localhost:5000/process_city', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ city: selectedCity }), // Send 'city' not 'selectedCity'
+        body: JSON.stringify({ city: selectedCity }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setImageBase64(data.image_base64); // Set the base64 string from response
+        setImageBase64(data.image_base64);
       } else {
-        const errorData = await response.json();
-        console.error('Error:', errorData.error);
+        console.error('Error fetching data.');
       }
     } catch (error) {
       console.error('Request failed:', error);
@@ -36,43 +29,52 @@ const TemperatureTrend = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-800">
-      <h1 className="text-3xl font-bold text-center mb-8 text-blue-500">Weather Change Visualization</h1>
-
-      <div className="mb-6">
-        <select
-          id="city"
-          value={selectedCity}
-          onChange={handleCityChange}
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          {cities.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <button
-        onClick={fetchTemperatureTrend}
-        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
-      >
-        Fetch Temperature Trend
-      </button>
-
-      {imageBase64 && (
-        <div className="mt-8 text-center">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4"> {(disCity === '') ? ('') : (`Temperature Trend for ${disCity}`)}</h2>
-          <img
-            src={`data:image/png;base64,${imageBase64}`} // Display image from base64 string
-            alt={`Temperature Trend for ${selectedCity}`}
-            className="max-w-full h-auto rounded-lg shadow-lg"
-          />
+    <div className="bg-gray-100 min-h-screen">
+      {/* Header */}
+      <header className="bg-blue-600 p-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl text-white font-bold">Temperature Trends</h1>
         </div>
-      )}
+      </header>
+
+      {/* Content */}
+      <main className="max-w-7xl mx-auto p-6">
+        {/* City Selector */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Select a City</h2>
+          <select
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg"
+          >
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={fetchTemperatureTrend}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Fetch Trend
+          </button>
+        </div>
+
+        {/* Trend Image */}
+        {imageBase64 && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Temperature Trend for {selectedCity}</h2>
+            <img
+              src={`data:image/png;base64,${imageBase64}`}
+              alt={`Temperature Trend for ${selectedCity}`}
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+        )}
+      </main>
     </div>
   );
 };
 
-export default TemperatureTrend
+export default TemperatureTrend;

@@ -1,28 +1,76 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TempertureTrend from '../TempTrend/TemperatureTrend';
 
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (e) => {
-    e.preventDefault();
+  const navigateToTemperatureTrend = () => {
     navigate('/temperature-trend');
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-800 text-blue-800">
-      <h1 className="text-5xl font-bold mb-8">Climate Change Dashboard</h1>
-      <p className="text-lg mb-8 text-center max-w-2xl">
-        Welcome to the Climate Change Dashboard. Explore data and trends related to temperature changes, CO₂ emissions, and more for major cities in India.
-      </p>
-      <button
-        type='button'
-        onClick={handleNavigate}
-        className="px-8 py-4 bg-blue-700 hover:bg-blue-800 rounded-lg text-xl font-semibold transition duration-200 text-gray-300"
-      >
-        Check Temperature Trends
-      </button>
+    <div className="bg-gray-100 min-h-screen">
+      {/* Header */}
+      <header className="bg-blue-600 p-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-center">
+          <h1 className="text-3xl text-white font-bold">Climate Insights</h1>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-4">Explore the Climate Changes Across Major Cities of India</h2>
+          <p className="text-lg">
+            Dive into Historical Data Analysis of temperature trends, CO₂ emissions, and more across major Indian cities.
+          </p>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Feature 1 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">Temperature Trends</h3>
+            <p className="text-gray-600 mb-4">
+              Analyze temperature changes over the years across Indian cities.
+            </p>
+            <button
+              onClick={navigateToTemperatureTrend}
+              className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+            >
+              View Trends
+            </button>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">CO₂ Emissions</h3>
+            <p className="text-gray-600 mb-4">
+              Understand CO₂ emissions and their impact on climate change.
+            </p>
+            <button
+              className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Coming Soon
+            </button>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+            <h3 className="text-xl font-semibold mb-2">City Comparisons</h3>
+            <p className="text-gray-600 mb-4">
+              Compare climate data between major Indian cities.
+            </p>
+            <button
+              className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Coming Soon
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
