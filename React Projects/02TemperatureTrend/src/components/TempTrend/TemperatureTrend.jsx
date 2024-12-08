@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 
 const TemperatureTrend = () => {
   const [selectedCity, setSelectedCity] = useState('----');
-  const [imageBase64, setImageBase64] = useState('');
+  const [imagePath, setImagePath] = useState('');
+  const [disCity, setDisCity] = useState('')
 
-  const cities = ["----", "Ahmedabad", "Bengaluru", "Chennai", "Delhi", "Hyderabad", "Kolkata", "Mumbai", "Pune"];
+  const cities = ["Ahemadabad", "Bengaluru", "Chennai", "Delhi", "Hyderabad", "Kolkata", "Mumbai", "Pune"];
 
   const fetchTemperatureTrend = async () => {
     if (selectedCity === "----") return;
+    
     try {
       const response = await fetch('http://localhost:5000/process_city', {
         method: 'POST',
@@ -19,7 +21,9 @@ const TemperatureTrend = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setImageBase64(data.image_base64);
+        // console.log(data.image_path)
+        setImagePath(`http://localhost:5000${data.image_path}`);
+        setDisCity(selectedCity);
       } else {
         console.error('Error fetching data.');
       }
@@ -47,6 +51,10 @@ const TemperatureTrend = () => {
             onChange={(e) => setSelectedCity(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg"
           >
+            <option value="----" disabled>
+              ----
+            </option>
+
             {cities.map((city) => (
               <option key={city} value={city}>
                 {city}
@@ -62,11 +70,11 @@ const TemperatureTrend = () => {
         </div>
 
         {/* Trend Image */}
-        {imageBase64 && (
+        {imagePath && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Temperature Trend for {selectedCity}</h2>
+            <h2 className="text-xl font-semibold mb-4">Temperature Trend for {disCity}</h2>
             <img
-              src={`data:image/png;base64,${imageBase64}`}
+              src={imagePath}
               alt={`Temperature Trend for ${selectedCity}`}
               className="w-full h-auto rounded-lg"
             />
