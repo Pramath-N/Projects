@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import pandas as pd
 from io import BytesIO
+import seaborn as sns
 
 app = Flask(__name__)
 
@@ -93,6 +94,100 @@ def process_city_data(city):
     except Exception as e:
         print(f"Error in processing data for {city}: {e}")
         return None
+
+@app.route('/compare_cities', methods=['GET'])
+def compare_cities_heatmap():
+    try:
+        # Load the CSV file
+        file_path = r"C:\Users\prama\PycharmProjects\climate_change_backend\TemperatureTrendDataset.csv"
+        df = pd.read_csv(file_path)
+
+        # Preprocess the DataFrame
+        df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
+        df = df.dropna(subset=['Date'])
+        df['Year'] = df['Date'].dt.year
+
+        # Filter for the 8 cities
+        cities = ["ahemadabad", "bengaluru", "chennai", "delhi", "hyderabad", "kolkata", "mumbai", "pune"]
+        city_data = df[df['City'].str.lower().isin(cities)]
+
+        # Ensure 'Temp Avg' is numeric
+        city_data['Temp Avg'] = (pd.to_numeric(city_data['Temp Max'], errors='coerce') +
+                                 pd.to_numeric(city_data['Temp Min'], errors='coerce')) / 2
+        city_data = city_data.dropna(subset=['Temp Avg'])
+
+        # Group by Year and City and calculate average temperature
+        city_year_avg = city_data.groupby(['City', 'Year'])['Temp Avg'].mean().unstack()
+
+        # Create a heatmap
+        plt.figure(figsize=(12, 8))
+        sns.heatmap(city_year_avg, annot=False, cmap="coolwarm", linewidths=0.5)
+        plt.title("Heatmap of Yearly Avg Temperatures Across Cities")
+        plt.ylabel("City")
+        plt.xlabel("Year")
+
+        # Save heatmap
+        img_file_name = "city_comparison_heatmap.png"
+        img_path = os.path.join(STATIC_DIR, img_file_name)
+        plt.savefig(img_path)
+        plt.close()
+
+        return jsonify({"image_path": f"/static/{img_file_name}"}), 200
+    except Exception as e:
+        print(f"Error in processing data for city comparison: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/compare_cities_radar', methods=['GET'])
+def compare_cities_radar():
+    try:
+        # Load the CSV file
+        file_path = r"C:\Users\prama\PycharmProjects\climate_change_backend\TemperatureTrendDataset.csv"
+        df = pd.read_csv(file_path)
+
+        # Preprocess the DataFrame
+        df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y', errors='coerce')
+        df = df.dropna(subset=['Date'])
+        df['Year'] = df['Date'].dt.year
+
+        # Filter for the 8 cities
+        cities = ["ahemadabad", "bengaluru", "chennai", "delhi", "hyderabad", "kolkata", "mumbai", "pune"]
+        city_data = df[df['City'].str.lower().isin(cities)]
+
+        # Ensure 'Temp Avg' is numeric
+        city_data['Temp Avg'] = (pd.to_numeric(city_data['Temp Max'], errors='coerce') +
+                                 pd.to_numeric(city_data['Temp Min'], errors='coerce')) / 2
+        city_data = city_data.dropna(subset=['Temp Avg'])
+
+        # Calculate the average temperature for each city
+        city_avg_temp = city_data.groupby('City')['Temp Avg'].mean()
+
+        # Radar Chart Data Preparation
+        labels = city_avg_temp.index.tolist()
+        values = city_avg_temp.values.tolist()
+        values += values[:1]  # Close the circle
+
+        # Create Radar Chart
+        angles = [n / float(len(labels)) * 2 * 3.14159 for n in range(len(labels))]
+        angles += angles[:1]
+
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw={'projection': 'polar'})
+        ax.fill(angles, values, color='blue', alpha=0.25)
+        ax.plot(angles, values, color='blue', linewidth=2)
+        ax.set_yticks([])
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(labels)
+        ax.set_title("Radar Chart of Avg Temperatures Across Cities", va='bottom')
+
+        # Save Radar Chart
+        img_file_name = "city_comparison_radar.png"
+        img_path = os.path.join(STATIC_DIR, img_file_name)
+        plt.savefig(img_path)
+        plt.close()
+
+        return jsonify({"image_path": f"/static/{img_file_name}"}), 200
+    except Exception as e:
+        print(f"Error in processing data for radar chart: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
