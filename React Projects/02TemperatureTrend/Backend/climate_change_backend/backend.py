@@ -12,6 +12,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 
+
 # Configure CORS to allow requests from the frontend
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
@@ -40,6 +41,7 @@ def process_city():
             return jsonify({"error": f"Error processing data for {city}: {str(e)}"}), 500
     else:
         return jsonify({"error": "No city provided"}), 400
+
 def process_city_data(city):
     try:
         # Load the CSV file
@@ -51,39 +53,39 @@ def process_city_data(city):
         df = df.dropna(subset=['Date'])
         df['Year'] = df['Date'].dt.year
 
-        # print(df.head())
         # Filter data by city
         city_data = df[df['City'].str.lower() == city.lower()]
         if city_data.empty:
             raise ValueError(f"No data available for the city: {city}")
 
-        # Ensure 'Temp Max' is numeric
-        city_data = city_data.copy()  # Ensure we're working with a new DataFrame, not a slice
-
         # Ensure 'Temp Max' and 'Temp Min' are numeric
+        city_data = city_data.copy()  # Ensure we're working with a new DataFrame, not a slice
         city_data.loc[:, 'Temp Max'] = pd.to_numeric(city_data['Temp Max'], errors='coerce')
         city_data.loc[:, 'Temp Min'] = pd.to_numeric(city_data['Temp Min'], errors='coerce')
 
-        # Calculate 'Temp Avg'
-        city_data.loc[:, 'Temp Avg'] = city_data['Temp Min'] + (city_data['Temp Min'] / 2)
-
-        # Drop rows with missing 'Temp Avg'
-        city_data = city_data.dropna(subset=['Temp Avg'])
+        # Calculate yearly average temperature
+        yearly_data = city_data.groupby('Year').agg({
+            'Temp Min': 'mean',
+            'Temp Max': 'mean'
+        }).reset_index()
 
         # Calculate yearly average temperature
-        yearly_avg = city_data.groupby('Year')['Temp Avg'].mean().reset_index()
+        yearly_data['Temp Avg'] = (yearly_data['Temp Min'] + yearly_data['Temp Max']) / 2
 
         # Create a plot
         fig, ax = plt.subplots(figsize=(12, 6))
-        ax.plot(yearly_avg['Year'], yearly_avg['Temp Avg'], label='Yearly Avg Temperature', color='orange')
-        ax.set_title(f'Yearly Average Temperature Trend for {city.capitalize()}')
+        ax.plot(yearly_data['Year'], yearly_data['Temp Min'], label='Yearly Avg Temp Min', color='blue')
+        ax.plot(yearly_data['Year'], yearly_data['Temp Max'], label='Yearly Avg Temp Max', color='red')
+        ax.plot(yearly_data['Year'], yearly_data['Temp Avg'], label='Yearly Avg Temp', color='orange', linestyle='--')
+        ax.set_title(f'Yearly Temperature Trends for {city.capitalize()}')
         ax.set_xlabel('Year')
-        ax.set_ylabel('Average Temperature (°C)')
+        ax.set_ylabel('Temperature (°C)')
         ax.legend()
         ax.grid(True)
 
+        # Save the plot as an image
         img_file_name = f"{city.lower()}_temperature_trend.png"
-        img_path =os.path.join(STATIC_DIR, img_file_name)
+        img_path = os.path.join(STATIC_DIR, img_file_name)
         plt.savefig(img_path)
         plt.close(fig)
 
@@ -91,6 +93,7 @@ def process_city_data(city):
     except Exception as e:
         print(f"Error in processing data for {city}: {e}")
         return None
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
