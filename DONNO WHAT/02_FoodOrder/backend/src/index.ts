@@ -15,6 +15,9 @@ app.use(express.json());
 //middleware for cross platform access
 app.use(cors());
 
+app.get("/health", async(req: Request , res: Response) => {
+    res.send(" Health OK! ")
+})
 
 //Whenever a request is made to /api/v1/user, the userRouter will be called
 app.use('/api/v1/my/user', userRouter)
