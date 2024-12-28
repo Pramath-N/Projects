@@ -29,7 +29,7 @@ const Home = () => {
 
       {/* Features Section */}
       <section className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="felx justify-center items-center">
           {/* Feature 1 */}
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <h3 className="text-xl font-semibold mb-2">Temperature Trends</h3>
@@ -41,32 +41,6 @@ const Home = () => {
               className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
             >
               View Trends
-            </button>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h3 className="text-xl font-semibold mb-2">CO₂ Emissions</h3>
-            <p className="text-gray-600 mb-4">
-              Understand CO₂ emissions and their impact on climate change.
-            </p>
-            <button
-              className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Coming Soon
-            </button>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h3 className="text-xl font-semibold mb-2">City Comparisons</h3>
-            <p className="text-gray-600 mb-4">
-              Compare climate data between major Indian cities.
-            </p>
-            <button
-              className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Coming Soon
             </button>
           </div>
         </div>
