@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 function TemperatureComparisonApp() {
   const [selectedCity, setSelectedCity] = useState('----');
   const [imagePath, setImagePath] = useState('');
-  const [disCity, setDisCity] = useState('');
-  const [comparisonImagePath, setComparisonImagePath] = useState(null);
+  const [disCity, setDisCity] = useState('----');
+  const [comparisonImagePaths, setComparisonImagePaths] = useState(null);
 
   const cities = ["Ahemadabad", "Bengaluru", "Chennai", "Delhi", "Hyderabad", "Kolkata", "Mumbai", "Pune"];
 
@@ -30,27 +30,27 @@ function TemperatureComparisonApp() {
         console.error('Error fetching data.');
       }
     } catch (error) {
-      console.error('Request failed:', error);
+      console.error('Request failed:', error.message);
     }
   };
 
-  // Function to fetch the comparison chart
+  // Function to fetch comparison charts (heatmap or radar)
   const fetchComparisonChart = async (type) => {
-    try {
-      const endpoint = type === 'heatmap' 
-        ? 'http://localhost:5000/compare_cities' 
-        : 'http://localhost:5000/compare_cities_radar';
+    const endpoint = type === 'heatmap'
+      ? 'http://localhost:5000/compare_cities'
+      : 'http://localhost:5000/compare_cities_radar';
 
+    try {
       const response = await fetch(endpoint);
 
       if (response.ok) {
         const data = await response.json();
-        setComparisonImagePath(`http://localhost:5000${data.image_path}`);
+        setComparisonImagePaths(data.image_paths);
       } else {
-        console.error("Failed to fetch the comparison chart.");
+        console.error("Failed to fetch comparison charts.");
       }
     } catch (error) {
-      console.error("Error fetching comparison chart:", error);
+      console.error("Error fetching comparison charts:", error);
     }
   };
 
@@ -99,29 +99,43 @@ function TemperatureComparisonApp() {
       <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-3/4">
         <h2 className="text-xl font-semibold mb-4">Compare City Trends</h2>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 mb-4">
           <button
             onClick={() => fetchComparisonChart('heatmap')}
             className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
           >
-            View Heatmap
+            View Heatmaps
           </button>
           <button
             onClick={() => fetchComparisonChart('radar')}
             className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
           >
-            View Radar Chart
+            View Radar Charts
           </button>
         </div>
 
-        {comparisonImagePath && (
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">City Comparison Chart</h2>
-            <img 
-              src={comparisonImagePath} 
-              alt="City Comparison Chart" 
-              className="w-full h-auto rounded-lg" 
-            />
+        {comparisonImagePaths && (
+          <div>
+            {comparisonImagePaths.max_temp && (
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold mb-4">Max Temperature</h2>
+                <img
+                  src={`http://localhost:5000${comparisonImagePaths.max_temp}`}
+                  alt="Max Temperature Chart"
+                  className="w-full h-auto rounded-lg"
+                />
+              </div>
+            )}
+            {comparisonImagePaths.min_temp && (
+              <div>
+                <h2 className="text-lg font-semibold mb-4">Min Temperature</h2>
+                <img
+                  src={`http://localhost:5000${comparisonImagePaths.min_temp}`}
+                  alt="Min Temperature Chart"
+                  className="w-full h-auto rounded-lg"
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

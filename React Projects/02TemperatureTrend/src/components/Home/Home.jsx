@@ -22,7 +22,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">Explore the Climate Changes Across Major Cities of India</h2>
           <p className="text-lg">
-            Dive into Historical Data Analysis of temperature trends, CO₂ emissions, and more across major Indian cities.
+            Dive into Historical Data Analysis of temperature trends across major Indian cities.
           </p>
         </div>
       </section>
